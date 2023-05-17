@@ -1,0 +1,135 @@
+* {
+    font-family: Comfortaa, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#container {
+
+    margin: auto;
+    width: auto;
+    }
+
+header {
+    grid-area: header;
+    background-color: #7c7e7d;
+    padding: 1rem;
+}
+
+nav {
+    grid-area: nav;
+    text-align: center;
+    font-size: 1.5rem;
+
+}
+
+.navbar-links{
+    display: inline;
+    float: right;
+}
+
+main {
+    grid-area: main;
+    padding: 1rem;
+    background-color: #ffffff;
+}
+
+h1, h2, h3, h4 {
+    padding: 1rem 0;
+    font-family: 'Suez One', serif;
+    color: #000;
+    text-shadow: 2px 2px 4px #fff;
+}
+
+p {
+    padding: 0.5rem 0;
+}
+
+a {
+    color: #222;
+}
+
+img {
+    width: 100%;
+}
+.dataForm {
+    margin: 1rem 0;
+    border: 1px solid #999;
+    padding: 1rem;
+    background-color: #fcc;
+    border-radius: 10px;
+}
+
+.dataForm input, textarea {
+    width: 100%;
+    border-radius: 10px;
+    padding: 0.3rem;
+    margin-bottom: 10px;
+}
+
+.dataForm p input {
+    display: inline;
+    width: 1rem;
+    margin-left: 0.5rem;
+}
+
+.error {
+    color: #f00;
+}
+
+.login {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 2px dashed #fff;
+}
+
+table {
+    width: 100%;
+    border: 2px solid #666;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #888;
+    padding: 0.2rem;
+    text-align: left;
+}
+th {
+    background-color: #000;
+    color: #fff;
+}
+
+img .thumb {
+    max-width: 90px;
+}
+footer {
+    grid-area: footer;
+    padding: 1rem;
+    background-color: #7c7e7d;
+}
+
+footer p {
+    color: #000;
+    text-shadow: 2px 2px 4px #fff;
+    font-size: 1.5rem;
+}
+
+footer img {
+    float: right;
+}
+
+nav {
+    background: #484747;
+    padding: 0.5rem;
+}
+
+@media only screen and (max-width: 600px) {
+    .container {
+        width: 100%;
+    }
+
+    .product-box {
+        width: 49%;
+    }
+}
