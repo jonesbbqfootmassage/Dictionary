@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block pageheading %}
+Vocabulary
+{% endblock %}
+
+
+{% block main %}
+
+    <table>
+        <tr>
+            <th>Maori Word</th>
+            <th>English Word</th>
+            <th>Definition</th>
+            <th>Level</th>
+        </tr>
+
+        {% for word in words %}
+        <tr>
+            <td>{{ word[1] }}</td>
+            <td>{{ word[2] }}</td>
+            <td>{{ word[3] }}</td>
+            <td>{{ word[4] }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+{% endblock %}

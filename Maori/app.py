@@ -31,13 +31,18 @@ def is_logged_in():     # shows if or if not logged in
 
 @app.route('/')     # calls main page
 def render_homepage():
+    return render_template('home.html', logged_in=is_logged_in())
+
+
+@app.route('/allvocab')
+def render_all_vocab():
     con = open_database(DATABASE)
     query = "SELECT * FROM words_list"
     cur = con.cursor()
     cur.execute(query)
     words_list = cur.fetchall()
     print(words_list)
-    return render_template('home.html', logged_in=is_logged_in())
+    return render_template('allvocab.html', words=words_list, logged_in=is_logged_in())
 
 
 @app.route('/vocab/<cat_id>')     # calls vocabulary page
@@ -113,7 +118,7 @@ def render_signup():
         lname = request.form.get('lname').title()
         email = request.form.get('email').lower().strip()
         password = request.form.get('password')
-        password2 = request.form.get('password2')
+        password2 = request.form.get('password2')       # form for user to input name, email, password
 
         if password != password2:
             return redirect("\signup?error=Passwords+do+not+match")
@@ -137,6 +142,61 @@ def render_signup():
 
     return render_template('signup.html', logged_in=is_logged_in())
 
+
+@app.route('/admin')
+def render_admin():
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in')      # in case where user accesses without logging in
+    con = open_database(DATABASE)
+    query = "SELECT * FROM category_table"
+    cur = con.execute(query)
+    category_list = cur.fetchall()
+    con.close()
+    return render_template("admin.html", logged_in=is_logged_in(), categories=category_list)
+
+
+@app.route('/add_category', methods=['POST'])
+def add_category():
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in')
+    if request.method == 'POST':
+        print(request.form)
+        cat_name = request.form.get('category_table')
+        print(cat_name)
+        con = open_database(DATABASE)
+        query = "INSERT INTO category_table ('Category') VALUES (?)"
+        cur = con.cursor()
+        cur.execute(query, (cat_name, ))
+        con.commit()
+        con.close()
+        return redirect('/admin')
+
+
+@app.route('/delete_category', methods=['POST'])
+def render_delete_category():
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in')
+    if request.method == 'POST':
+        category_table = request.form.get('cat_id')
+        print("category: ", category_table)
+        category_table = category_table.split(", ")
+        cat_id = category_table[0]
+        cat_name = category_table[1]
+        return render_template("delete_confirm.html", id=cat_id, name=cat_name, type='category_table')
+    return redirect('/admin')
+
+
+@app.route('/delete_category_confirm/<cat_id>')
+def delete_category_confirm(cat_id):
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in')
+    con = open_database(DATABASE)
+    query = "DELETE FROM category_table WHERE id = ?"
+    cur = con.cursor()
+    cur.execute(query, (cat_id, ))
+    con.commit()
+    con.close()
+    return redirect("/admin")
 
 
 app.run(host='0.0.0.0', debug=True)
