@@ -34,7 +34,7 @@ def render_homepage():
     return render_template('home.html', logged_in=is_logged_in())
 
 
-@app.route('/allvocab')
+@app.route('/allvocab')     # shows all vocabulary
 def render_all_vocab():
     con = open_database(DATABASE)
     query = "SELECT * FROM words_list"
@@ -161,7 +161,7 @@ def add_category():
         return redirect('/?message=Need+to+be+logged+in')
     if request.method == 'POST':
         print(request.form)
-        cat_name = request.form.get('category_table')
+        cat_name = request.form.get('name')
         print(cat_name)
         con = open_database(DATABASE)
         query = "INSERT INTO category_table ('Category') VALUES (?)"
@@ -186,7 +186,7 @@ def render_delete_category():
     return redirect('/admin')
 
 
-@app.route('/delete_category_confirm/<cat_id>')
+@app.route('/delete_category_table_confirm/<cat_id>')
 def delete_category_confirm(cat_id):
     if not is_logged_in():
         return redirect('/?message=Need+to+be+logged+in')
