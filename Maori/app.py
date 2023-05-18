@@ -29,9 +29,18 @@ def is_logged_in():     # shows if or if not logged in
         return True
 
 
+def is_teacher():
+    if session.get('teacher') == True:
+        print("i am teacher")
+        return True
+    else:
+        print("not teacher")
+        return False
+
+
 @app.route('/')     # calls main page
 def render_homepage():
-    return render_template('home.html', logged_in=is_logged_in())
+    return render_template('home.html', logged_in=is_logged_in(), teacher=is_teacher())
 
 
 @app.route('/allvocab')     # shows all vocabulary
@@ -42,7 +51,7 @@ def render_all_vocab():
     cur.execute(query)
     words_list = cur.fetchall()
     print(words_list)
-    return render_template('allvocab.html', words=words_list, logged_in=is_logged_in())
+    return render_template('allvocab.html', words=words_list, logged_in=is_logged_in(), teacher=is_teacher())
 
 
 @app.route('/vocab/<cat_id>')     # calls vocabulary page
@@ -61,7 +70,7 @@ def render_vocab(cat_id):
     print(words_list)
     con.close()
 
-    return render_template('vocab.html', words=words_list, categories=category_list, logged_in=is_logged_in())
+    return render_template('vocab.html', words=words_list, categories=category_list, logged_in=is_logged_in(), teacher=is_teacher())
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -73,7 +82,7 @@ def render_login():
         email = request.form['email'].strip().lower()
         password = request.form['password'].strip().lower()
 
-        query = """SELECT id, fname, password FROM user WHERE email = ?"""
+        query = """SELECT id, fname, password, teacher FROM user WHERE email = ?"""
         con = open_database(DATABASE)
         cur = con.cursor()
         cur.execute(query, (email,))
@@ -87,6 +96,7 @@ def render_login():
         user_id = user_data[0][0]
         first_name = user_data[0][1]
         db_password = user_data[0][2]
+        teacher = user_data[0][3]
 
         if not bcrypt.check_password_hash(db_password, password):
             return redirect(request.referrer + "?error=Email+invalid+or+password+incorrect")
@@ -94,10 +104,11 @@ def render_login():
         session['email'] = email
         session['user_id'] = user_id
         session['first_name'] = first_name
+        session['teacher'] = teacher
         print(session)
         return redirect('/')
 
-    return render_template('login.html', logged_in=is_logged_in())
+    return render_template('login.html', logged_in=is_logged_in(), teacher=is_teacher())
 
 
 @app.route('/logout')
@@ -119,6 +130,7 @@ def render_signup():
         email = request.form.get('email').lower().strip()
         password = request.form.get('password')
         password2 = request.form.get('password2')       # form for user to input name, email, password
+        teacher = request.form.get('teacher')
 
         if password != password2:
             return redirect("\signup?error=Passwords+do+not+match")
@@ -128,11 +140,11 @@ def render_signup():
 
         hashed_password = bcrypt.generate_password_hash(password)
         con = open_database(DATABASE)
-        query = "INSERT INTO user (fname, lname, email, password) VALUES (?, ?, ?, ?)"
-        cur = con.cursor()
 
+        query = "INSERT INTO user (fname, lname, email, password, teacher) VALUES (?, ?, ?, ?, ?)"
+        cur = con.cursor()
         try:
-            cur.execute(query, (fname, lname, email, hashed_password))
+            cur.execute(query, (fname, lname, email, hashed_password, teacher))
         except sqlite3.IntegrityError:
             con.close()
             return redirect("\signup?error=Email+is+already+used")
@@ -140,7 +152,7 @@ def render_signup():
         con.close()
         return redirect("/login")
 
-    return render_template('signup.html', logged_in=is_logged_in())
+    return render_template('signup.html', logged_in=is_logged_in(), teacher=is_teacher())
 
 
 @app.route('/admin')
@@ -152,7 +164,7 @@ def render_admin():
     cur = con.execute(query)
     category_list = cur.fetchall()
     con.close()
-    return render_template("admin.html", logged_in=is_logged_in(), categories=category_list)
+    return render_template("admin.html", logged_in=is_logged_in(), categories=category_list, teacher=is_teacher())
 
 
 @app.route('/add_category', methods=['POST'])
@@ -182,7 +194,7 @@ def render_delete_category():
         category_table = category_table.split(", ")
         cat_id = category_table[0]
         cat_name = category_table[1]
-        return render_template("delete_confirm.html", id=cat_id, name=cat_name, type='category_table')
+        return render_template("delete_confirm.html", id=cat_id, name=cat_name, type='category_table', teacher=is_teacher())
     return redirect('/admin')
 
 

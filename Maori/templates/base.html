@@ -19,9 +19,11 @@
                 <a href="/">Home</a>
                 <a href="/vocab/1">Vocabulary</a>
                 <a href="/allvocab">All Words</a>
-                {% if logged_in %}
-                <a href="/logout">Logout</a>
+                {% if teacher %}
                 <a href="/admin">Admin</a>
+                <a href="/logout">Logout</a>
+                {% elif logged_in %}
+                <a href="/logout">Logout</a>
                 {% else %}
                 <a href="/login">Login</a>
                 {% endif %}
