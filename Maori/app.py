@@ -159,6 +159,8 @@ def render_signup():
 def render_admin():
     if not is_logged_in():
         return redirect('/?message=Need+to+be+logged+in')      # in case where user accesses without logging in
+    elif not is_teacher():
+        return redirect('/?message=You+are+not+registered+as+a+teacher')    # if student tries access admin...
     con = open_database(DATABASE)
     query = "SELECT * FROM category_table"
     cur = con.execute(query)
