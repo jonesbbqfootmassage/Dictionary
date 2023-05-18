@@ -6,13 +6,29 @@ Vocabulary
 
 
 {% block main %}
-<table>
-    <tr>
-        <th>Test title</th>
-    </tr>
-    <tr>
-        <td>Test test</td>
-        <td>Test again</td>
-    </tr>
-</table>
+
+    {% for category in categories %}
+        <th><a href="/vocab/{{ category[0] }}">{{ category[1] }}</a></th>
+    {% endfor %}
+
+    <table>
+        <tr>
+            <th>Maori Word</th>
+            <th>English Word</th>
+            <th>Definition</th>
+            <th>Level</th>
+            <th>Category</th>
+        </tr>
+
+        {% for word in words %}
+        <tr>
+            <td>{{ word[1] }}</td>
+            <td>{{ word[2] }}</td>
+            <td>{{ word[3] }}</td>
+            <td>{{ word[4] }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
 {% endblock %}

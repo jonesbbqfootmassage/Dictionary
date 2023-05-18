@@ -46,7 +46,7 @@ def render_vocab(cat_id):
     print(words_list)
     con.close()
 
-    return render_template('vocab.html', words=words_list, categories=category_list     )
+    return render_template('vocab.html', words=words_list, categories=category_list)
 
 
 
