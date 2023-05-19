@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, request, session
 import sqlite3
 from sqlite3 import Error
 from flask_bcrypt import Bcrypt
+from datetime import datetime
 
 
 DATABASE = "C:/Users/lante/OneDrive - Wellington College/2023/13DTS/Maori/maori_words.db"
@@ -53,6 +54,18 @@ def render_all_vocab():
     con.close()
     print(words_list)
     return render_template('allvocab.html', words=words_list, logged_in=is_logged_in(), teacher=is_teacher())
+
+
+@app.route('/singleword/<ID>')
+def render_singe_word(ID):
+    con = open_database(DATABASE)
+    query = "SELECT * FROM words_list WHERE ID = ?"
+    cur = con.cursor()
+    cur.execute(query, (ID, ))
+    single_word = cur.fetchone()
+    con.close()
+    print(single_word)
+    return render_template('singleword.html', words=single_word, logged_in=is_logged_in(), teacher=is_teacher())
 
 
 @app.route('/vocab/<cat_id>')     # calls vocabulary page based on category
@@ -168,12 +181,16 @@ def render_admin():
     cur.execute(query)
     words_list = cur.fetchall()
 
+    query = "SELECT * FROM user"
+    cur.execute(query)
+    user_list = cur.fetchall()
+
     query = "SELECT * FROM category_table"
     cur = con.execute(query)
     category_list = cur.fetchall()
     con.close()
     return render_template("admin.html", logged_in=is_logged_in(), words=words_list,
-                           categories=category_list, teacher=is_teacher())
+                           categories=category_list, user=user_list, teacher=is_teacher())
 
 
 @app.route('/add_word', methods=['POST'])
@@ -186,19 +203,22 @@ def add_word():
         english = request.form.get('English')
         definition = request.form.get('Definition')
         level = request.form.get('Level')
-
         category = request.form.get('category')
-        category = category.split(', ')
-        cat_id = category[0]
+        category = category.split(', ')     # splits the category into two different values,
+        cat_id = category[0]                # instead of posting together as one
         cat_name = category[1]
+        entrydate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')    # adds date and time
+        user_input_id = session.get('first_name')      # saves user who input word
 
-        print(maori, english, definition, level, cat_id, cat_name)
+        print(maori, english, definition, level, cat_id, cat_name, entrydate)
+        print(user_input_id)
 
         con = open_database(DATABASE)
-        query = "INSERT INTO words_list (maori, english, definition, level, cat_id, category) " \
-                "VALUES (?, ?, ?, ?, ?, ?)"
+        query = "INSERT INTO words_list (maori, english, definition, level, cat_id, category, entrydate, user_input_id) " \
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"     # adds word details into database
         cur = con.cursor()
-        cur.execute(query, (maori, english, definition, level, cat_id, cat_name))
+        cur.execute(query, (maori, english, definition, level, cat_id, cat_name, entrydate, user_input_id))
+
         con.commit()
         con.close()
         return redirect('/admin')
@@ -217,6 +237,7 @@ def delete_word():
         return render_template("delete_confirm.html", id=word_id, name=word_name, words=words_list,
                                type='word')
     return redirect('/admin')
+
 
 @app.route('/delete_word_confirm/<word_id>')
 def delete_vocabulary_confirm(word_id):
@@ -243,7 +264,7 @@ def add_category():
         cat_name = request.form.get('name')
         print(cat_name)
         con = open_database(DATABASE)
-        query = "INSERT INTO category_table ('Category') VALUES (?)"
+        query = "INSERT INTO category_table ('Category') VALUES (?)"    # inserts new category into database
         cur = con.cursor()
         cur.execute(query, (cat_name, ))
         con.commit()
@@ -277,6 +298,25 @@ def delete_category_confirm(cat_id):
     con.commit()
     con.close()
     return redirect("/admin")
+
+
+@app.route('/search', methods=['GET', 'POST'])
+def render_search():
+    search = request.form['search']  # contents of search bar goes through here
+    title = "Search for " + search
+    query = "SELECT ID, Maori, English, Definition, Level, cat_id, category FROM words_list WHERE " \
+            "ID like ? OR Maori like ? OR English like ? OR Definition like ? OR Level like ? OR category like ?"
+    print(search)
+    # Allows wildcard search
+    search = "%" + search + "%"
+    con = open_database(DATABASE)
+    cur = con.cursor()
+    print(search)
+    cur.execute(query, (search, search, search, search, search, search))
+    words_list = cur.fetchall()
+    print(words_list)
+    con.close()
+    return render_template("allvocab.html", title=title, words=words_list, logged_in=is_logged_in(), teacher=is_teacher())
 
 
 app.run(host='0.0.0.0', debug=True)

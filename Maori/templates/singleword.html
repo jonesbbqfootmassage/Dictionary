@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block pageheading %}
-Vocabulary List
+Details showing for "{{ words[1] }}"
 {% endblock %}
 
 
@@ -15,22 +15,25 @@ Vocabulary List
             <th>Level</th>
             <th>Category</th>
             <th>Image</th>
+            <th>Date/Time Added</th>
+            <th>User</th>
         </tr>
 
-        {% for word in words %}
         <tr>
-            <td><a href=/singleword/{{ word[0] }}>{{ word[1] }}</a></td>
-            <td>{{ word[2] }}</td>
-            <td>{{ word[3] }}</td>
-            <td>{{ word[4] }}</td>
-            <td>{{ word[6] }}</td>
-            {% if word[7] %}
-            <td><img src="/static/images/{{ word[7] }}" alt="image not available" width></td>
+            <td>{{ words[1] }}</td>
+            <td>{{ words[2] }}</td>
+            <td>{{ words[3] }}</td>
+            <td>{{ words[4] }}</td>
+            <td>{{ words[6] }}</td>
+            {% if words[7] %}
+            <td><img src="/static/images/{{ words[7] }}" alt="image not available" width></td>
             {% else %}
             <td><img src="/static/images/noimage.png" alt="image not available"></td>
             {% endif %}
+            <td>{{ words[8] }}</td>
+            <td>{{ words[9] }}</td>
         </tr>
-        {% endfor %}
+
     </table>
 
 {% endblock %}

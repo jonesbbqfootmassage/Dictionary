@@ -17,14 +17,20 @@ Vocabulary by Category
             <th>English Word</th>
             <th>Definition</th>
             <th>Level</th>
+            <th>Image</th>
         </tr>
 
         {% for word in words %}
         <tr>
-            <td>{{ word[1] }}</td>
+            <td><a href=/singleword/{{ word[0] }}>{{ word[1] }}</a></td>
             <td>{{ word[2] }}</td>
             <td>{{ word[3] }}</td>
             <td>{{ word[4] }}</td>
+            {% if word[7] %}
+            <td><img src="/static/images/{{ word[7] }}" alt="image not available" width="200"></td>
+            {% else %}
+            <td><img src="/static/images/noimage.png" alt="image not available" width="200"></td>
+            {% endif %}
         </tr>
         {% endfor %}
     </table>
