@@ -54,7 +54,7 @@ def render_all_vocab():
     return render_template('allvocab.html', words=words_list, logged_in=is_logged_in(), teacher=is_teacher())
 
 
-@app.route('/vocab/<cat_id>')     # calls vocabulary page
+@app.route('/vocab/<cat_id>')     # calls vocabulary page based on category
 def render_vocab(cat_id):
     con = open_database(DATABASE)
     query = "SELECT * FROM category_table"
@@ -167,6 +167,45 @@ def render_admin():
     category_list = cur.fetchall()
     con.close()
     return render_template("admin.html", logged_in=is_logged_in(), categories=category_list, teacher=is_teacher())
+
+
+@app.route('/add_word', methods=['POST'])
+def add_word():
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in')
+    if request.method == 'POST':
+        print(request.form)
+        maori = request.form.get('Maori')
+        english = request.form.get('English')
+        definition = request.form.get('Definition')
+        level = request.form.get('Level')
+        cat_id = request.form.get('cat_id')
+        category = request.form.get('category')
+
+        print(maori, english, definition, level, cat_id, category)
+
+        con = open_database(DATABASE)
+        query = "INSERT INTO words_list (maori, english, definition, level, cat_id, category) VALUES (?, ?, ?, ?, ?, ?)"
+        cur = con.cursor()
+        cur.execute(query, (maori, english, definition, level, cat_id, category))
+        con.commit()
+        con.close()
+        return redirect('/admin')
+
+
+@app.route('/delete_word', methods=['POST'])
+def delete_word():
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in')
+    if request.method == 'POST':
+        words_list = request.form.get('cat_id')
+        print("Deleted word: ", words_list)
+        words_list = words_list.split(", ")
+        word_id = words_list[0]
+        word_name = words_list[1]
+        return render_template("delete_confirm.html", id=word_id, name=word_name, words=words_list,
+                               type='words_list')
+    return redirect('/admin')
 
 
 @app.route('/add_category', methods=['POST'])

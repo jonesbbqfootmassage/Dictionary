@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block pageheading %}
-Vocabulary
+Vocabulary List
 {% endblock %}
 
 
@@ -13,6 +13,8 @@ Vocabulary
             <th>English Word</th>
             <th>Definition</th>
             <th>Level</th>
+            <th>Category</th>
+            <th>Image</th>
         </tr>
 
         {% for word in words %}
@@ -21,6 +23,8 @@ Vocabulary
             <td>{{ word[2] }}</td>
             <td>{{ word[3] }}</td>
             <td>{{ word[4] }}</td>
+            <td>{{ word[6] }}</td>
+
         </tr>
         {% endfor %}
     </table>
