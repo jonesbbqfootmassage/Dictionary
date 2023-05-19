@@ -134,10 +134,10 @@ def render_signup():
         teacher = request.form.get('teacher')
 
         if password != password2:
-            return redirect("\signup?error=Passwords+do+not+match")
+            return redirect("/signup?error=Passwords+do+not+match")
 
         if len(password) < 8:
-            return redirect("\signup?error=Password+must+be+at+least+8+characters")
+            return redirect("/signup?error=Password+must+be+at+least+8+characters")
 
         hashed_password = bcrypt.generate_password_hash(password)
         con = open_database(DATABASE)
@@ -148,7 +148,7 @@ def render_signup():
             cur.execute(query, (fname, lname, email, hashed_password, teacher))
         except sqlite3.IntegrityError:
             con.close()
-            return redirect("\signup?error=Email+is+already+used")
+            return redirect("/signup?error=Email+is+already+used")
         con.commit()
         con.close()
         return redirect("/login")
@@ -209,13 +209,28 @@ def delete_word():
     if not is_logged_in():
         return redirect('/?message=Need+to+be+logged+in')
     if request.method == 'POST':
-        words_list = request.form.get('cat_id')
+        words_list = request.form.get('Maori')
         print("Deleted word: ", words_list)
         words_list = words_list.split(", ")
         word_id = words_list[0]
         word_name = words_list[1]
         return render_template("delete_confirm.html", id=word_id, name=word_name, words=words_list,
-                               type='words_list')
+                               type='word')
+    return redirect('/admin')
+
+@app.route('/delete_word_confirm/<word_id>')
+def delete_vocabulary_confirm(word_id):
+    if not is_logged_in():
+        return redirect('/?message=Need+to+be+logged+in')
+    print("confirming delete")
+
+    con = open_database(DATABASE)
+    query = "DELETE FROM words_list WHERE ID = ?"
+    cur = con.cursor()
+    cur.execute(query, (word_id, ))
+    con.commit()
+    con.close()
+    print(word_id)
     return redirect('/admin')
 
 
@@ -246,7 +261,8 @@ def render_delete_category():
         category_table = category_table.split(", ")
         cat_id = category_table[0]
         cat_name = category_table[1]
-        return render_template("delete_confirm.html", id=cat_id, name=cat_name, type='category_table', teacher=is_teacher())
+        return render_template("delete_confirm.html", id=cat_id, name=cat_name, type='category_table',
+                               teacher=is_teacher())
     return redirect('/admin')
 
 
