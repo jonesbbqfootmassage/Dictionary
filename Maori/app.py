@@ -50,6 +50,7 @@ def render_all_vocab():
     cur = con.cursor()
     cur.execute(query)
     words_list = cur.fetchall()
+    con.close()
     print(words_list)
     return render_template('allvocab.html', words=words_list, logged_in=is_logged_in(), teacher=is_teacher())
 
@@ -162,11 +163,17 @@ def render_admin():
     elif not is_teacher():
         return redirect('/?message=You+are+not+registered+as+a+teacher')    # if student tries access admin...
     con = open_database(DATABASE)
+    query = "SELECT * FROM words_list"
+    cur = con.cursor()
+    cur.execute(query)
+    words_list = cur.fetchall()
+
     query = "SELECT * FROM category_table"
     cur = con.execute(query)
     category_list = cur.fetchall()
     con.close()
-    return render_template("admin.html", logged_in=is_logged_in(), categories=category_list, teacher=is_teacher())
+    return render_template("admin.html", logged_in=is_logged_in(), words=words_list,
+                           categories=category_list, teacher=is_teacher())
 
 
 @app.route('/add_word', methods=['POST'])
@@ -179,15 +186,19 @@ def add_word():
         english = request.form.get('English')
         definition = request.form.get('Definition')
         level = request.form.get('Level')
-        cat_id = request.form.get('cat_id')
-        category = request.form.get('category')
 
-        print(maori, english, definition, level, cat_id, category)
+        category = request.form.get('category')
+        category = category.split(', ')
+        cat_id = category[0]
+        cat_name = category[1]
+
+        print(maori, english, definition, level, cat_id, cat_name)
 
         con = open_database(DATABASE)
-        query = "INSERT INTO words_list (maori, english, definition, level, cat_id, category) VALUES (?, ?, ?, ?, ?, ?)"
+        query = "INSERT INTO words_list (maori, english, definition, level, cat_id, category) " \
+                "VALUES (?, ?, ?, ?, ?, ?)"
         cur = con.cursor()
-        cur.execute(query, (maori, english, definition, level, cat_id, category))
+        cur.execute(query, (maori, english, definition, level, cat_id, cat_name))
         con.commit()
         con.close()
         return redirect('/admin')

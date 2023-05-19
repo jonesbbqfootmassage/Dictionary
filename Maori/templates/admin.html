@@ -74,8 +74,8 @@
         <div class="form-label"><label for="name">Word:</label></div>
         <div class="form-element">
             <select id="Maori" name="Maori">
-                {% for words_list in words_list %}
-                <option value="{{ words_list[0] }}, {{ words_list[1] }}">{{ words_list[1] }}</option>
+                {% for word in words %}
+                <option value="{{ word[0] }}, {{ word[1] }}">{{ word[1] }}</option>
                 {% endfor %}
             </select>
         </div>
